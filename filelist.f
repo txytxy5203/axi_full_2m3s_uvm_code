@@ -1,0 +1,13 @@
+rtl/axi_2m3s_full_dut.v
++incdir+tb
++incdir+tb/interfaces
++incdir+tb/axi
++incdir+tb/env
++incdir+tb/seq
++incdir+tb/tests
+tb/interfaces/axi_full_if.sv
+tb/axi/axi_pkg.sv
+tb/env/axi_env_pkg.sv
+tb/seq/axi_seq_pkg.sv
+tb/tests/axi_test_pkg.sv
+tb/tb_top.sv

@@ -1,0 +1,20 @@
+/*******************************************************************************
+ * File        : axi_error_boundary_test.sv
+ * Project     : AXI4 Full 2M3S UVM Teaching Project
+ * Purpose     : Single UVM testcase file for one AXI4 Full verification scenario.
+ * Style       : Course-ready code with clear structure for RTL/UVM explanation.
+ * Learn More  : www.bcbaoic.top
+ *******************************************************************************/
+
+class axi_error_boundary_test extends axi_base_test;
+    `uvm_component_utils(axi_error_boundary_test)
+    function new(string name = "axi_error_boundary_test", uvm_component parent = null); super.new(name, parent); endfunction
+    virtual task run_phase(uvm_phase phase);
+        axi_error_boundary_seq seq;
+        phase.raise_objection(this);
+        seq = axi_error_boundary_seq::type_id::create("seq");
+        seq.start(env.m0_agent.seqr);
+        wait_for_drain(600);
+        phase.drop_objection(this);
+    endtask
+endclass
