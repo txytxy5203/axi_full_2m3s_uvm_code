@@ -27,6 +27,15 @@
 //   S1: 0x0001_0000 - 0x0001_0FFF
 //   S2: 0x0002_0000 - 0x0002_0FFF
 // -----------------------------------------------------------------------------
+// 概念讲解：
+// 普通传输（非突发）：
+//    发地址 → 传1个数据 → 发地址 → 传1个数据 → 发地址 → 传1个数据
+
+// 突发传输（AXI）：
+//    发1次地址 → 传数据[0] → 传数据[1] → 传数据[2] → ... → 传数据[N]
+
+
+
 
 module axi_2m3s_full_dut #(
     parameter ADDR_WIDTH = 32,      // 地址总线宽度 32 位
@@ -94,8 +103,10 @@ module axi_2m3s_full_dut #(
     input  wire [7:0]            m0_arlen,     // 读突发长度
     input  wire [2:0]            m0_arsize,    // 数据宽度
     input  wire [1:0]            m0_arburst,   // 突发类型
-    input  wire                  m0_arvalid,   // Master 发读地址：有效
-    output reg                   m0_arready    // DUT 收读地址：准备好了
+    // Master 发读地址：有效
+    input  wire                  m0_arvalid,   
+    // DUT 收读地址：准备好了
+    output reg                   m0_arready     
 
     // ------------------------- M0 read data ----------------------------------
     output reg  [ID_WIDTH-1:0]   m0_rid,       // 读数据 ID（与 arid 对应）
@@ -291,6 +302,15 @@ endtask
 // 写地址管道: AW 地址进入 → [awslot] → 等待 W 数据 → 激活写上下文
 // 写响应管道: 写完成后 → [bslot] → 延迟等待 → B 响应返回
 
+
+// Master 发 AR → [rslot] → delay 倒计时 → [ractive 上下文] → R 通道逐个 beat 返回
+//                                                                     ↑
+//                                                               read_word() 从内存读
+
+// Master 发 AW → [awslot] → 等待空闲 → [wactive 上下文] → 收 W 数据 → write_word() 写内存
+//                                                                     ↓
+//                                                               完成后 → [bslot] → delay → B 响应
+
 reg                   m0_rslot_valid [0:RD_SLOTS-1];  // 该 slot 是否被占用
 reg [ID_WIDTH-1:0]    m0_rslot_id    [0:RD_SLOTS-1];  // 事务 ID
 reg [ADDR_WIDTH-1:0]  m0_rslot_addr  [0:RD_SLOTS-1];  // 读地址
@@ -301,7 +321,7 @@ reg [7:0]             m0_rslot_delay [0:RD_SLOTS-1];  // 延迟计数器
 // Master 发 AR 地址 → 找到一个空闲 rslot，存入所有信息
 // delay 每个时钟减 1，直到减到 0
 // 当 delay=0 时，从该 slot 取出信息，开始通过 R 通道返回数据
-// 为什么需要 8 个？ 支持 8 个 outstanding 读请求同时排队。
+// 为什么需要 8 个？ 支持 8 个 outstanding 读请求同时排队
 
 reg [ADDR_WIDTH-1:0]  m0_ractive_addr;   // 当前正在返回的读地址
 reg [7:0]             m0_ractive_len;     // 当前突发总长度
@@ -318,17 +338,31 @@ reg [7:0]             m0_awslot_len   [0:WR_SLOTS-1];  // 突发长度
 reg [1:0]             m0_awslot_resp  [0:WR_SLOTS-1];  // 响应状态
 reg [1:0]             m0_awslot_slave [0:WR_SLOTS-1];  // 目标 Slave
 
-reg                   m0_wactive;          // 是否正在处理一个写事务
-reg [ID_WIDTH-1:0]    m0_wid;              // 当前写事务 ID
-reg [ADDR_WIDTH-1:0]  m0_waddr;            // 当前写基地址
-reg [7:0]             m0_wlen;             // 当前突发长度
-reg [7:0]             m0_wbeat;            // 当前已收到第几个 beat
-reg [1:0]             m0_wresp;            // 当前写响应
-reg [1:0]             m0_wslave;           // 当前目标 Slave
-reg                   m0_bslot_valid [0:WR_SLOTS-1];
-reg [ID_WIDTH-1:0]    m0_bslot_id    [0:WR_SLOTS-1];
-reg [1:0]             m0_bslot_resp  [0:WR_SLOTS-1];
-reg [7:0]             m0_bslot_delay [0:WR_SLOTS-1];
+reg                   m0_wactive;                       // 是否正在处理一个写事务
+reg [ID_WIDTH-1:0]    m0_wid;                           // 当前写事务 ID
+reg [ADDR_WIDTH-1:0]  m0_waddr;                         // 当前写基地址
+reg [7:0]             m0_wlen;                          // 当前突发长度
+reg [7:0]             m0_wbeat;                         // 当前已收到第几个 beat
+reg [1:0]             m0_wresp;                         // 当前写响应
+reg [1:0]             m0_wslave;                        // 当前目标 Slave
+reg                   m0_bslot_valid [0:WR_SLOTS-1];    // 该 slot 是否被占用
+reg [ID_WIDTH-1:0]    m0_bslot_id    [0:WR_SLOTS-1];    // 事务 ID
+reg [1:0]             m0_bslot_resp  [0:WR_SLOTS-1];    // 响应状态
+reg [7:0]             m0_bslot_delay [0:WR_SLOTS-1];    // 延迟计数器
+
+
+// 8 个 rslot 就是 8 个 outstanding 读槽位
+// Outstanding = 不等前一个完成就能发下一个，像流水线一样提高效率
+// Master 可以连续发 8 个读请求，每个占用一个 rslot
+// 不需要等第一个返回再发第二个
+
+// 发第 1 个请求 → 占用 rslot[0]
+// 发第 2 个请求 → 占用 rslot[1]  ← 不等 rslot[0] 完成！
+// 发第 3 个请求 → 占用 rslot[2]
+// ...
+// 发第 9 个请求 → 没有空闲 rslot 了 → arready=0 → Master 必须等待
+
+
 
 // -----------------------------------------------------------------------------
 // M1 state
@@ -363,12 +397,16 @@ reg [ID_WIDTH-1:0]    m1_bslot_id    [0:WR_SLOTS-1];
 reg [1:0]             m1_bslot_resp  [0:WR_SLOTS-1];
 reg [7:0]             m1_bslot_delay [0:WR_SLOTS-1];
 
+
 // Ready generation
 always @* begin
+    // 先默认拉低
     m0_awready = 1'b0;
     m0_arready = 1'b0;
     m1_awready = 1'b0;
     m1_arready = 1'b0;
+    // 写地址通道
+    // 只要 8 个 awslot 中还有至少一个空闲，就拉高 awready，告诉 Master "我可以收地址"
     for (i = 0; i < WR_SLOTS; i = i + 1) begin
         if (!m0_awslot_valid[i]) m0_awready = 1'b1;
         if (!m1_awslot_valid[i]) m1_awready = 1'b1;
@@ -377,12 +415,15 @@ always @* begin
         if (!m0_rslot_valid[i]) m0_arready = 1'b1;
         if (!m1_rslot_valid[i]) m1_arready = 1'b1;
     end
+    // 复位时所有 ready 拉低
     if (!aresetn) begin
         m0_awready = 1'b0;
         m0_arready = 1'b0;
         m1_awready = 1'b0;
         m1_arready = 1'b0;
     end
+    
+    // 写数据通道
     m0_wready = aresetn && m0_wactive;
     m1_wready = aresetn && m1_wactive;
 end
@@ -390,12 +431,15 @@ end
 // Main state machine for both master-facing ports.
 always @(posedge aclk or negedge aresetn) begin
     if (!aresetn) begin
+        // 清空所有输出通道
         m0_bvalid <= 1'b0; m0_bresp <= AXI_RESP_OKAY; m0_bid <= {ID_WIDTH{1'b0}};
         m0_rvalid <= 1'b0; m0_rresp <= AXI_RESP_OKAY; m0_rid <= {ID_WIDTH{1'b0}}; m0_rdata <= {DATA_WIDTH{1'b0}}; m0_rlast <= 1'b0;
         m0_wactive <= 1'b0; m0_wbeat <= 8'd0;
         m1_bvalid <= 1'b0; m1_bresp <= AXI_RESP_OKAY; m1_bid <= {ID_WIDTH{1'b0}};
         m1_rvalid <= 1'b0; m1_rresp <= AXI_RESP_OKAY; m1_rid <= {ID_WIDTH{1'b0}}; m1_rdata <= {DATA_WIDTH{1'b0}}; m1_rlast <= 1'b0;
         m1_wactive <= 1'b0; m1_wbeat <= 8'd0;
+        
+        // 清空所有 slot
         for (i = 0; i < RD_SLOTS; i = i + 1) begin
             m0_rslot_valid[i] <= 1'b0;
             m1_rslot_valid[i] <= 1'b0;
@@ -408,17 +452,25 @@ always @(posedge aclk or negedge aresetn) begin
         end
     end else begin
         // delay counters
+        // 延迟计数器（每个时钟减 1）
+        // 这是整个乱序机制的核心！ 每个 rslot 和 bslot 都有自己的 delay 计数器，每个时钟减 1。
+        // 当减到 0 时，表示该事务"准备好了"，可以返回了
         for (i = 0; i < RD_SLOTS; i = i + 1) begin
-            if (m0_rslot_valid[i] && m0_rslot_delay[i] != 8'd0) m0_rslot_delay[i] <= m0_rslot_delay[i] - 8'd1;
-            if (m1_rslot_valid[i] && m1_rslot_delay[i] != 8'd0) m1_rslot_delay[i] <= m1_rslot_delay[i] - 8'd1;
+            if (m0_rslot_valid[i] && m0_rslot_delay[i] != 8'd0) 
+                m0_rslot_delay[i] <= m0_rslot_delay[i] - 8'd1;
+            if (m1_rslot_valid[i] && m1_rslot_delay[i] != 8'd0) 
+                m1_rslot_delay[i] <= m1_rslot_delay[i] - 8'd1;
         end
         for (i = 0; i < WR_SLOTS; i = i + 1) begin
-            if (m0_bslot_valid[i] && m0_bslot_delay[i] != 8'd0) m0_bslot_delay[i] <= m0_bslot_delay[i] - 8'd1;
-            if (m1_bslot_valid[i] && m1_bslot_delay[i] != 8'd0) m1_bslot_delay[i] <= m1_bslot_delay[i] - 8'd1;
+            if (m0_bslot_valid[i] && m0_bslot_delay[i] != 8'd0) 
+                m0_bslot_delay[i] <= m0_bslot_delay[i] - 8'd1;
+            if (m1_bslot_valid[i] && m1_bslot_delay[i] != 8'd0) 
+                m1_bslot_delay[i] <= m1_bslot_delay[i] - 8'd1;
         end
 
         // ----------------------------- M0 AR accept --------------------------
         if (m0_arvalid && m0_arready) begin
+            // 握手成功
             free_idx = -1;
             for (i = 0; i < RD_SLOTS; i = i + 1) begin
                 if (!m0_rslot_valid[i] && free_idx == -1) free_idx = i;
