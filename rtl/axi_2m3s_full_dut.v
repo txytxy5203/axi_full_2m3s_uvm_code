@@ -287,31 +287,44 @@ endtask
 // -----------------------------------------------------------------------------
 // M0 state
 // -----------------------------------------------------------------------------
-reg                   m0_rslot_valid [0:RD_SLOTS-1];
-reg [ID_WIDTH-1:0]    m0_rslot_id    [0:RD_SLOTS-1];
-reg [ADDR_WIDTH-1:0]  m0_rslot_addr  [0:RD_SLOTS-1];
-reg [7:0]             m0_rslot_len   [0:RD_SLOTS-1];
-reg [1:0]             m0_rslot_resp  [0:RD_SLOTS-1];
-reg [1:0]             m0_rslot_slave [0:RD_SLOTS-1];
-reg [7:0]             m0_rslot_delay [0:RD_SLOTS-1];
-reg [ADDR_WIDTH-1:0]  m0_ractive_addr;
-reg [7:0]             m0_ractive_len;
-reg [7:0]             m0_ractive_beat;
-reg [1:0]             m0_ractive_slave;
+// 读管道:   AR 地址进入 → [rslot] → 延迟等待 → R 数据返回
+// 写地址管道: AW 地址进入 → [awslot] → 等待 W 数据 → 激活写上下文
+// 写响应管道: 写完成后 → [bslot] → 延迟等待 → B 响应返回
 
-reg                   m0_awslot_valid [0:WR_SLOTS-1];
-reg [ID_WIDTH-1:0]    m0_awslot_id    [0:WR_SLOTS-1];
-reg [ADDR_WIDTH-1:0]  m0_awslot_addr  [0:WR_SLOTS-1];
-reg [7:0]             m0_awslot_len   [0:WR_SLOTS-1];
-reg [1:0]             m0_awslot_resp  [0:WR_SLOTS-1];
-reg [1:0]             m0_awslot_slave [0:WR_SLOTS-1];
-reg                   m0_wactive;
-reg [ID_WIDTH-1:0]    m0_wid;
-reg [ADDR_WIDTH-1:0]  m0_waddr;
-reg [7:0]             m0_wlen;
-reg [7:0]             m0_wbeat;
-reg [1:0]             m0_wresp;
-reg [1:0]             m0_wslave;
+reg                   m0_rslot_valid [0:RD_SLOTS-1];  // 该 slot 是否被占用
+reg [ID_WIDTH-1:0]    m0_rslot_id    [0:RD_SLOTS-1];  // 事务 ID
+reg [ADDR_WIDTH-1:0]  m0_rslot_addr  [0:RD_SLOTS-1];  // 读地址
+reg [7:0]             m0_rslot_len   [0:RD_SLOTS-1];  // 突发长度
+reg [1:0]             m0_rslot_resp  [0:RD_SLOTS-1];  // 响应状态 (OKAY/DECERR)
+reg [1:0]             m0_rslot_slave [0:RD_SLOTS-1];  // 目标 Slave 编号
+reg [7:0]             m0_rslot_delay [0:RD_SLOTS-1];  // 延迟计数器
+// Master 发 AR 地址 → 找到一个空闲 rslot，存入所有信息
+// delay 每个时钟减 1，直到减到 0
+// 当 delay=0 时，从该 slot 取出信息，开始通过 R 通道返回数据
+// 为什么需要 8 个？ 支持 8 个 outstanding 读请求同时排队。
+
+reg [ADDR_WIDTH-1:0]  m0_ractive_addr;   // 当前正在返回的读地址
+reg [7:0]             m0_ractive_len;     // 当前突发总长度
+reg [7:0]             m0_ractive_beat;    // 当前已返回到第几个 beat
+reg [1:0]             m0_ractive_slave;   // 当前目标 Slave
+
+
+// awslot 没有 delay 字段！ 因为写地址通道只负责存地址信息
+// 真正的延迟是在写响应（B 通道）才加的
+reg                   m0_awslot_valid [0:WR_SLOTS-1];  // 该 slot 是否被占用
+reg [ID_WIDTH-1:0]    m0_awslot_id    [0:WR_SLOTS-1];  // 写事务 ID
+reg [ADDR_WIDTH-1:0]  m0_awslot_addr  [0:WR_SLOTS-1];  // 写地址
+reg [7:0]             m0_awslot_len   [0:WR_SLOTS-1];  // 突发长度
+reg [1:0]             m0_awslot_resp  [0:WR_SLOTS-1];  // 响应状态
+reg [1:0]             m0_awslot_slave [0:WR_SLOTS-1];  // 目标 Slave
+
+reg                   m0_wactive;          // 是否正在处理一个写事务
+reg [ID_WIDTH-1:0]    m0_wid;              // 当前写事务 ID
+reg [ADDR_WIDTH-1:0]  m0_waddr;            // 当前写基地址
+reg [7:0]             m0_wlen;             // 当前突发长度
+reg [7:0]             m0_wbeat;            // 当前已收到第几个 beat
+reg [1:0]             m0_wresp;            // 当前写响应
+reg [1:0]             m0_wslave;           // 当前目标 Slave
 reg                   m0_bslot_valid [0:WR_SLOTS-1];
 reg [ID_WIDTH-1:0]    m0_bslot_id    [0:WR_SLOTS-1];
 reg [1:0]             m0_bslot_resp  [0:WR_SLOTS-1];
