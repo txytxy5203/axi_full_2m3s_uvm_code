@@ -468,24 +468,60 @@ always @(posedge aclk or negedge aresetn) begin
                 m1_bslot_delay[i] <= m1_bslot_delay[i] - 8'd1;
         end
 
+        时间轴：
+
+        // Master: 拉高 arvalid，发地址 arid=0x5, araddr=0x1000_0040, arlen=4
+        //            │
+        //            ▼
+        // DUT:    拉高 arready（表示有空闲 slot）
+        //            │
+        //            ▼  [握手成功！] 在时钟上升沿
+                
+        // DUT 内部操作：
+        //   ① 找空闲 slot → 找到 slot[3]
+        //   ② slot[3].valid = 1
+        //   ③ slot[3].id    = 0x5
+        //   ④ slot[3].addr  = 0x1000_0040
+        //   ⑤ slot[3].len   = 4
+        //   ⑥ slot[3].slave = decode_slave(0x1000_0040) = S1
+        //   ⑦ slot[3].resp  = OKAY（地址合法）
+        //   ⑧ slot[3].delay = slave_latency(S1, id=0x5) = 5 + id[1:0] = 5~8 拍
+
+
         // ----------------------------- M0 AR accept --------------------------
+        // Master → DUT：arid, araddr, arlen, arsize, arburst, arvalid
+        // DUT → Master：arready
+
+        // 流程：
+        // ① Master 拉高 arvalid，发地址
+        // ② DUT 检查是否有空闲 rslot
+        // ③ 有空闲 → 握手成功，存入 rslot
+        // ④ 存入时：解码目标 Slave，判断合法性，设置延迟
+        // ⑤ 延迟 = slave_latency(Slave, ID)
+
+        // 关键：读请求被"暂存"在 rslot 中，不等立即返回
         if (m0_arvalid && m0_arready) begin
             // 握手成功
             free_idx = -1;
+            // 找一个空闲的 slot
             for (i = 0; i < RD_SLOTS; i = i + 1) begin
                 if (!m0_rslot_valid[i] && free_idx == -1) free_idx = i;
             end
             if (free_idx != -1) begin
+                // 存入所有信息
                 m0_rslot_valid[free_idx] <= 1'b1;
                 m0_rslot_id[free_idx]    <= m0_arid;
                 m0_rslot_addr[free_idx]  <= m0_araddr;
                 m0_rslot_len[free_idx]   <= m0_arlen;
-                m0_rslot_slave[free_idx] <= decode_slave(m0_araddr);
+                m0_rslot_slave[free_idx] <= decode_slave(m0_araddr);        // 地址解码
+                // 判断段地址是否合法
                 m0_rslot_resp[free_idx]  <= legal_burst(m0_araddr, m0_arlen, m0_arsize, m0_arburst) ? AXI_RESP_OKAY : AXI_RESP_DECERR;
                 m0_rslot_delay[free_idx] <= slave_latency(decode_slave(m0_araddr), m0_arid);
             end
         end
 
+
+        // 同上
         // ----------------------------- M1 AR accept --------------------------
         if (m1_arvalid && m1_arready) begin
             free_idx = -1;
@@ -503,7 +539,22 @@ always @(posedge aclk or negedge aresetn) begin
             end
         end
 
+
+
         // ----------------------------- M0 AW accept --------------------------
+        // Master → DUT：awid, awaddr, awlen, awsize, awburst, awvalid
+        // DUT → Master：awready
+
+        // 流程：
+        // ① Master 拉高 awvalid，发地址
+        // ② DUT 检查是否有空闲 awslot
+        // ③ 有空闲 → DUT 拉高 awready，握手成功
+        // ④ 把地址信息存入 awslot（暂存，等 W 数据来）
+        // ⑤ 没有空闲 → DUT 拉低 awready，Master 等待
+
+        // 关键：AW 通道只负责"接收地址"，不管数据
+
+
         if (m0_awvalid && m0_awready) begin
             free_idx = -1;
             for (i = 0; i < WR_SLOTS; i = i + 1) begin
@@ -532,30 +583,51 @@ always @(posedge aclk or negedge aresetn) begin
                 m1_awslot_len[free_idx]   <= m1_awlen;
                 m1_awslot_slave[free_idx] <= decode_slave(m1_awaddr);
                 m1_awslot_resp[free_idx]  <= legal_burst(m1_awaddr, m1_awlen, m1_awsize, m1_awburst) ? AXI_RESP_OKAY : AXI_RESP_DECERR;
+                // 注意：写地址 slot 没有 delay 计数器！
+                // 因为写操作的"延迟"是在 bslot（写响应）阶段才加的
             end
         end
 
+        // 写操作的核心
         // ----------------------------- M0 start W context --------------------
+        // Master → DUT：wdata, wstrb, wlast, wvalid
+        // DUT → Master：wready
+
+        // 流程：
+        // ① 如果 awslot 中有待处理的写请求 → DUT 拉高 wready
+        // ② Master 发数据（可能多个 beat）
+        // ③ 每拍握手成功 → 从 awslot 取出地址 → 调 write_word() 写内存
+        // ④ 最后一个 beat（wlast=1）→ 生成 B 响应，存入 bslot
+        // ⑤ wactive 回到空闲，准备处理下一个写请求
+
+        // 关键：写内存是立即的，没有延迟
         if (!m0_wactive) begin
+            // 如果当前没有正在处理的写事务，就从 awslot 中找一个有效的事务，开始处理
             sel = -1;
+            // 从 awslot 中找一个有效的写请求
             for (i = 0; i < WR_SLOTS; i = i + 1) begin
                 if (m0_awslot_valid[i] && sel == -1) sel = i;
             end
             if (sel != -1) begin
+                // 找到了一个有效的写请求，加载到 "写上下文"
                 m0_wactive <= 1'b1;
                 m0_wid     <= m0_awslot_id[sel];
                 m0_waddr   <= m0_awslot_addr[sel];
                 m0_wlen    <= m0_awslot_len[sel];
-                m0_wresp   <= m0_awslot_resp[sel];
+                m0_wresp   <= m0_awslot_resp[sel];       // 取响应（OKAY/DECERR）
                 m0_wslave  <= m0_awslot_slave[sel];
-                m0_wbeat   <= 8'd0;
-                m0_awslot_valid[sel] <= 1'b0;
+                m0_wbeat   <= 8'd0;                     // 当前是第 0 个 beat
+                m0_awslot_valid[sel] <= 1'b0;           // 释放这个 awslot
             end
         end else if (m0_wvalid && m0_wready) begin
+            // 如果当前正在处理一个写事务，并且 Master 发来了 W 数据（wvalid=1），就接收数据
             if (m0_wresp == AXI_RESP_OKAY) begin
+                // 如果地址合法 就写入内存
                 write_word(m0_wslave, m0_waddr + ({24'd0, m0_wbeat} << 2), m0_wdata, m0_wstrb);
             end
             if (m0_wlast || m0_wbeat == m0_wlen) begin
+                // 如果是最后一个 beat，或者已经收到了所有 beat，就结束这个写事务
+                // 生成写响应 B
                 free_idx = -1;
                 for (i = 0; i < WR_SLOTS; i = i + 1) begin
                     if (!m0_bslot_valid[i] && free_idx == -1) free_idx = i;
@@ -568,6 +640,7 @@ always @(posedge aclk or negedge aresetn) begin
                 end
                 m0_wactive <= 1'b0;
             end else begin
+                // 还没有结束，继续接收下一个 beat
                 m0_wbeat <= m0_wbeat + 8'd1;
             end
         end
@@ -610,18 +683,32 @@ always @(posedge aclk or negedge aresetn) begin
         end
 
         // ----------------------------- M0 B channel --------------------------
+        // DUT → Master：bid, bresp, bvalid
+        // Master → DUT：bready
+
+        // 流程：
+        // ① 写完成后，响应存入 bslot
+        // ② 存入时设置延迟（slave_latency）
+        // ③ 每个时钟延迟减 1
+        // ④ 延迟到 0 → DUT 拉高 bvalid，返回 bid + bresp
+        // ⑤ Master 拉高 bready 接收 → 握手完成
+        // ⑥ 从后往前扫描，后完成的先返回（LIFO）
+
+        // 关键：写操作的"延迟"体现在这里，不在 W 通道
         if (m0_bvalid && m0_bready) begin
-            m0_bvalid <= 1'b0;
+            m0_bvalid <= 1'b0;              // 释放 B 通道 回到空闲
         end else if (!m0_bvalid) begin
             sel = -1;
+            // 从后往前扫描 bslot
             for (i = WR_SLOTS-1; i >= 0; i = i - 1) begin
-                if (m0_bslot_valid[i] && m0_bslot_delay[i] == 8'd0 && sel == -1) sel = i;
+                if (m0_bslot_valid[i] && m0_bslot_delay[i] == 8'd0 && sel == -1) 
+                    sel = i;        // 找延迟到期
             end
             if (sel != -1) begin
-                m0_bid    <= m0_bslot_id[sel];
-                m0_bresp  <= m0_bslot_resp[sel];
-                m0_bvalid <= 1'b1;
-                m0_bslot_valid[sel] <= 1'b0;
+                m0_bid    <= m0_bslot_id[sel];     // 返回 ID，告诉 Master 是哪个写完成
+                m0_bresp  <= m0_bslot_resp[sel];   // 返回响应（OKAY/DECERR）
+                m0_bvalid <= 1'b1;                 // 拉高，发出去
+                m0_bslot_valid[sel] <= 1'b0;       // 释放这个 bslot
             end
         end
 
@@ -642,6 +729,19 @@ always @(posedge aclk or negedge aresetn) begin
         end
 
         // ----------------------------- M0 R channel --------------------------
+        // DUT → Master：rid, rdata, rresp, rlast, rvalid
+        // Master → DUT：rready
+
+        // 流程：
+        // ① 每个时钟，所有 rslot 的延迟减 1
+        // ② 延迟到 0 → 该请求"准备好了"
+        // ③ 从后往前扫描，找延迟到期的 rslot
+        // ④ 加载到 ractive_* 上下文寄存器
+        // ⑤ 发出第一个 beat（rvalid=1, rdata=第0个数据）
+        // ⑥ 每握手一次，ractive_beat+1，发下一个数据
+        // ⑦ 直到 ractive_beat == ractive_len → rlast=1，传输结束
+
+        // 关键：读的延迟在 rslot 中，多 beat 用 ractive 上下文管理
         if (m0_rvalid && m0_rready) begin
             if (m0_ractive_beat == m0_ractive_len) begin
                 m0_rvalid <= 1'b0;
