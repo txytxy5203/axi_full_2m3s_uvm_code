@@ -1,0 +1,179 @@
+# 
+# set TESTNAME axi_downstream_backpressure_test
+# axi_downstream_backpressure_test
+# source run.do
+# ============================================================
+# AXI4 Full 2M3S UVM Teaching Project
+# Running TESTNAME = axi_downstream_backpressure_test
+# SV random seed = 830930405
+# Questa transcript log = /home/txy/project/verilog/axi_full_2m3s_uvm_code/logs/axi_downstream_backpressure_test_seed_830930405.log
+# Project site = www.bcbaoic.top
+# ============================================================
+# QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 17 2018
+# Start time: 13:37:21 on Jul 30,2026
+# vlog -cover bcestf -work work rtl/axi_2m3s_full_dut.v 
+# -- Compiling module axi_2m3s_full_dut
+# 
+# Top level modules:
+# 	axi_2m3s_full_dut
+# End time: 13:37:21 on Jul 30,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# QuestaSim-64 vlog 10.7c Compiler 2018.08 Aug 17 2018
+# Start time: 13:37:21 on Jul 30,2026
+# vlog -cover bcestf -work work -sv "+incdir+/home/txy/apps/Questasim/questasim/linux_x86_64/verilog_src/uvm-1.1d/src" "+incdir+tb" "+incdir+tb/interfaces" "+incdir+tb/axi" "+incdir+tb/env" "+incdir+tb/seq" "+incdir+tb/tests" tb/interfaces/axi_full_if.sv tb/axi/axi_pkg.sv tb/env/axi_env_pkg.sv tb/seq/axi_seq_pkg.sv tb/tests/axi_test_pkg.sv tb/tb_top.sv 
+# -- Compiling interface axi_full_if
+# -- Compiling package axi_pkg
+# -- Importing package mtiUvm.uvm_pkg (uvm-1.1d Built-in)
+# ** Note: (vlog-2286) tb/axi/axi_pkg.sv(13): Using implicit +incdir+/home/txy/apps/Questasim/questasim/uvm-1.1d/../verilog_src/uvm-1.1d/src from import uvm_pkg
+# -- Compiling package axi_env_pkg
+# -- Importing package axi_pkg
+# -- Compiling package axi_seq_pkg
+# -- Importing package axi_env_pkg
+# -- Compiling package axi_test_pkg
+# -- Importing package axi_seq_pkg
+# -- Compiling module tb_top
+# -- Importing package axi_test_pkg
+# 
+# Top level modules:
+# 	tb_top
+# End time: 13:37:21 on Jul 30,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# vsim -coverage -sv_seed 830930405 -voptargs="+acc" -L mtiUvm work.tb_top "+UVM_TESTNAME=axi_downstream_backpressure_test" 
+# Start time: 13:37:20 on Jul 30,2026
+# ** Note: (vsim-3812) Design is being optimized...
+# //  Questa Sim-64
+# //  Version 10.7c linux_x86_64 Aug 17 2018
+# //
+# //  Copyright 1991-2018 Mentor Graphics Corporation
+# //  All Rights Reserved.
+# //
+# //  QuestaSim and its associated documentation contain trade
+# //  secrets and commercial or financial information that are the property of
+# //  Mentor Graphics Corporation and are privileged, confidential,
+# //  and exempt from disclosure under the Freedom of Information Act,
+# //  5 U.S.C. Section 552. Furthermore, this information
+# //  is prohibited from disclosure under the Trade Secrets Act,
+# //  18 U.S.C. Section 1905.
+# //
+# Loading sv_std.std
+# Loading work.axi_full_if(fast)
+# Loading mtiUvm.uvm_pkg
+# Loading work.axi_pkg(fast)
+# Loading work.axi_env_pkg(fast)
+# Loading work.axi_seq_pkg(fast)
+# Loading work.axi_test_pkg(fast)
+# Loading work.tb_top(fast)
+# Loading work.axi_full_if(fast)
+# Loading work.axi_2m3s_full_dut(fast)
+# Loading mtiUvm.questa_uvm_pkg(fast)
+# Loading /home/txy/apps/Questasim/questasim/uvm-1.1d/linux_x86_64/uvm_dpi.so
+# ----------------------------------------------------------------
+# UVM-1.1d
+# (C) 2007-2013 Mentor Graphics Corporation
+# (C) 2007-2013 Cadence Design Systems, Inc.
+# (C) 2006-2013 Synopsys, Inc.
+# (C) 2011-2013 Cypress Semiconductor Corp.
+# ----------------------------------------------------------------
+# 
+#   ***********       IMPORTANT RELEASE NOTES         ************
+# 
+#   You are using a version of the UVM library that has been compiled
+#   with `UVM_NO_DEPRECATED undefined.
+#   See http://www.eda.org/svdb/view.php?id=3313 for more details.
+# 
+#   You are using a version of the UVM library that has been compiled
+#   with `UVM_OBJECT_MUST_HAVE_CONSTRUCTOR undefined.
+#   See http://www.eda.org/svdb/view.php?id=3770 for more details.
+# 
+#       (Specify +UVM_NO_RELNOTES to turn off this notice)
+# 
+# UVM_INFO verilog_src/questa_uvm_pkg-1.2/src/questa_uvm_pkg.sv(215) @ 0: reporter [Questa UVM] QUESTA_UVM-1.2.3
+# UVM_INFO verilog_src/questa_uvm_pkg-1.2/src/questa_uvm_pkg.sv(216) @ 0: reporter [Questa UVM]  questa_uvm::init(+struct)
+# UVM_INFO @ 0: reporter [RNTST] Running test axi_downstream_backpressure_test...
+# UVM_INFO tb/axi/axi_driver.svh(87) @ 105000: uvm_test_top.env.m1_agent.drv [AXI_DRV] M1 drive WRITE kind=REQ op=WRITE mid=1 id=0xa addr=0x00000000 len=2 slave=-1 resp=0x0 ooo=0 depth=0
+# UVM_INFO tb/axi/axi_driver.svh(87) @ 105000: uvm_test_top.env.m0_agent.drv [AXI_DRV] M0 drive WRITE kind=REQ op=WRITE mid=0 id=0x2 addr=0x00000000 len=1 slave=-1 resp=0x0 ooo=0 depth=0
+# UVM_INFO tb/env/axi_scoreboard.svh(88) @ 145000: uvm_test_top.env.scb [AXI_SCB] WRITE model updated: kind=WRITE_DATA op=WRITE mid=0 id=0x2 addr=0x00000000 len=1 slave=0 resp=0x0 ooo=0 depth=0
+# UVM_INFO tb/axi/axi_driver.svh(87) @ 145000: uvm_test_top.env.m0_agent.drv [AXI_DRV] M0 drive WRITE kind=REQ op=WRITE mid=0 id=0xc addr=0x00010000 len=16 slave=-1 resp=0x0 ooo=0 depth=0
+# UVM_INFO tb/env/axi_scoreboard.svh(88) @ 155000: uvm_test_top.env.scb [AXI_SCB] WRITE model updated: kind=WRITE_DATA op=WRITE mid=1 id=0xa addr=0x00000000 len=2 slave=0 resp=0x0 ooo=0 depth=0
+# UVM_INFO tb/axi/axi_driver.svh(87) @ 155000: uvm_test_top.env.m1_agent.drv [AXI_DRV] M1 drive WRITE kind=REQ op=WRITE mid=1 id=0x1 addr=0x00020000 len=4 slave=-1 resp=0x0 ooo=0 depth=0
+# UVM_INFO tb/env/axi_scoreboard.svh(88) @ 225000: uvm_test_top.env.scb [AXI_SCB] WRITE model updated: kind=WRITE_DATA op=WRITE mid=1 id=0x1 addr=0x00020000 len=4 slave=2 resp=0x0 ooo=0 depth=0
+# UVM_INFO tb/axi/axi_driver.svh(117) @ 225000: uvm_test_top.env.m1_agent.drv [AXI_DRV] M1 drive READ kind=REQ op= READ mid=1 id=0x9 addr=0x00020000 len=1 slave=-1 resp=0x0 ooo=0 depth=0
+# UVM_INFO tb/axi/axi_driver.svh(117) @ 245000: uvm_test_top.env.m1_agent.drv [AXI_DRV] M1 drive READ kind=REQ op= READ mid=1 id=0xd addr=0x00000000 len=16 slave=-1 resp=0x0 ooo=0 depth=0
+# UVM_INFO tb/axi/axi_driver.svh(117) @ 265000: uvm_test_top.env.m1_agent.drv [AXI_DRV] M1 drive READ kind=REQ op= READ mid=1 id=0xa addr=0x00020000 len=1 slave=-1 resp=0x0 ooo=0 depth=0
+# UVM_INFO tb/axi/axi_driver.svh(117) @ 285000: uvm_test_top.env.m1_agent.drv [AXI_DRV] M1 drive READ kind=REQ op= READ mid=1 id=0xb addr=0x00000000 len=4 slave=-1 resp=0x0 ooo=0 depth=0
+# UVM_INFO tb/axi/axi_driver.svh(87) @ 305000: uvm_test_top.env.m1_agent.drv [AXI_DRV] M1 drive WRITE kind=REQ op=WRITE mid=1 id=0xd addr=0x00000000 len=4 slave=-1 resp=0x0 ooo=0 depth=0
+# UVM_INFO tb/env/axi_scoreboard.svh(88) @ 335000: uvm_test_top.env.scb [AXI_SCB] WRITE model updated: kind=WRITE_DATA op=WRITE mid=0 id=0xc addr=0x00010000 len=16 slave=1 resp=0x0 ooo=0 depth=0
+# UVM_INFO tb/axi/axi_driver.svh(117) @ 335000: uvm_test_top.env.m0_agent.drv [AXI_DRV] M0 drive READ kind=REQ op= READ mid=0 id=0xe addr=0x00010000 len=2 slave=-1 resp=0x0 ooo=0 depth=0
+# UVM_INFO tb/axi/axi_driver.svh(87) @ 355000: uvm_test_top.env.m0_agent.drv [AXI_DRV] M0 drive WRITE kind=REQ op=WRITE mid=0 id=0x8 addr=0x00020000 len=8 slave=-1 resp=0x0 ooo=0 depth=0
+# UVM_INFO tb/env/axi_scoreboard.svh(88) @ 375000: uvm_test_top.env.scb [AXI_SCB] WRITE model updated: kind=WRITE_DATA op=WRITE mid=1 id=0xd addr=0x00000000 len=4 slave=0 resp=0x0 ooo=0 depth=0
+# UVM_INFO tb/axi/axi_driver.svh(87) @ 375000: uvm_test_top.env.m1_agent.drv [AXI_DRV] M1 drive WRITE kind=REQ op=WRITE mid=1 id=0x1 addr=0x00000000 len=8 slave=-1 resp=0x0 ooo=0 depth=0
+# UVM_INFO tb/env/axi_scoreboard.svh(88) @ 465000: uvm_test_top.env.scb [AXI_SCB] WRITE model updated: kind=WRITE_DATA op=WRITE mid=0 id=0x8 addr=0x00020000 len=8 slave=2 resp=0x0 ooo=0 depth=0
+# UVM_ERROR tb/env/axi_scoreboard.svh(127) @ 465000: uvm_test_top.env.scb [AXI_SCB] READ data mismatch mid=1 id=0xd addr=0x00000000 beat=0 exp=0x500000c0 got=0x50000000
+# UVM_ERROR tb/env/axi_scoreboard.svh(127) @ 465000: uvm_test_top.env.scb [AXI_SCB] READ data mismatch mid=1 id=0xd addr=0x00000000 beat=1 exp=0x500000c1 got=0x50000001
+# UVM_ERROR tb/env/axi_scoreboard.svh(127) @ 465000: uvm_test_top.env.scb [AXI_SCB] READ data mismatch mid=1 id=0xd addr=0x00000000 beat=2 exp=0x500000c2 got=0x00000000
+# UVM_ERROR tb/env/axi_scoreboard.svh(127) @ 465000: uvm_test_top.env.scb [AXI_SCB] READ data mismatch mid=1 id=0xd addr=0x00000000 beat=3 exp=0x500000c3 got=0x00000000
+# UVM_INFO tb/axi/axi_driver.svh(87) @ 465000: uvm_test_top.env.m0_agent.drv [AXI_DRV] M0 drive WRITE kind=REQ op=WRITE mid=0 id=0xa addr=0x00000000 len=16 slave=-1 resp=0x0 ooo=0 depth=0
+# UVM_INFO tb/env/axi_scoreboard.svh(88) @ 485000: uvm_test_top.env.scb [AXI_SCB] WRITE model updated: kind=WRITE_DATA op=WRITE mid=1 id=0x1 addr=0x00000000 len=8 slave=0 resp=0x0 ooo=0 depth=0
+# UVM_INFO tb/axi/axi_driver.svh(87) @ 485000: uvm_test_top.env.m1_agent.drv [AXI_DRV] M1 drive WRITE kind=REQ op=WRITE mid=1 id=0x2 addr=0x00010000 len=1 slave=-1 resp=0x0 ooo=0 depth=0
+# UVM_INFO tb/env/axi_scoreboard.svh(88) @ 525000: uvm_test_top.env.scb [AXI_SCB] WRITE model updated: kind=WRITE_DATA op=WRITE mid=1 id=0x2 addr=0x00010000 len=1 slave=1 resp=0x0 ooo=0 depth=0
+# UVM_INFO tb/axi/axi_driver.svh(87) @ 525000: uvm_test_top.env.m1_agent.drv [AXI_DRV] M1 drive WRITE kind=REQ op=WRITE mid=1 id=0xb addr=0x00000000 len=1 slave=-1 resp=0x0 ooo=0 depth=0
+# UVM_INFO tb/env/axi_scoreboard.svh(88) @ 565000: uvm_test_top.env.scb [AXI_SCB] WRITE model updated: kind=WRITE_DATA op=WRITE mid=1 id=0xb addr=0x00000000 len=1 slave=0 resp=0x0 ooo=0 depth=0
+# UVM_INFO tb/axi/axi_driver.svh(117) @ 565000: uvm_test_top.env.m1_agent.drv [AXI_DRV] M1 drive READ kind=REQ op= READ mid=1 id=0x9 addr=0x00020000 len=4 slave=-1 resp=0x0 ooo=0 depth=0
+# UVM_INFO tb/axi/axi_driver.svh(117) @ 585000: uvm_test_top.env.m1_agent.drv [AXI_DRV] M1 drive READ kind=REQ op= READ mid=1 id=0x5 addr=0x00010000 len=4 slave=-1 resp=0x0 ooo=0 depth=0
+# UVM_INFO tb/env/axi_scoreboard.svh(88) @ 655000: uvm_test_top.env.scb [AXI_SCB] WRITE model updated: kind=WRITE_DATA op=WRITE mid=0 id=0xa addr=0x00000000 len=16 slave=0 resp=0x0 ooo=0 depth=0
+# UVM_INFO tb/axi/axi_driver.svh(117) @ 655000: uvm_test_top.env.m0_agent.drv [AXI_DRV] M0 drive READ kind=REQ op= READ mid=0 id=0x6 addr=0x00000000 len=4 slave=-1 resp=0x0 ooo=0 depth=0
+# UVM_INFO tb/axi/axi_driver.svh(117) @ 675000: uvm_test_top.env.m0_agent.drv [AXI_DRV] M0 drive READ kind=REQ op= READ mid=0 id=0x9 addr=0x00000000 len=2 slave=-1 resp=0x0 ooo=0 depth=0
+# UVM_INFO tb/axi/axi_driver.svh(87) @ 695000: uvm_test_top.env.m0_agent.drv [AXI_DRV] M0 drive WRITE kind=REQ op=WRITE mid=0 id=0x9 addr=0x00020000 len=2 slave=-1 resp=0x0 ooo=0 depth=0
+# UVM_INFO tb/env/axi_scoreboard.svh(88) @ 745000: uvm_test_top.env.scb [AXI_SCB] WRITE model updated: kind=WRITE_DATA op=WRITE mid=0 id=0x9 addr=0x00020000 len=2 slave=2 resp=0x0 ooo=0 depth=0
+# UVM_INFO tb/axi/axi_driver.svh(117) @ 745000: uvm_test_top.env.m0_agent.drv [AXI_DRV] M0 drive READ kind=REQ op= READ mid=0 id=0x9 addr=0x00020000 len=2 slave=-1 resp=0x0 ooo=0 depth=0
+# UVM_ERROR tb/env/axi_scoreboard.svh(127) @ 765000: uvm_test_top.env.scb [AXI_SCB] READ data mismatch mid=0 id=0x6 addr=0x00000000 beat=0 exp=0x50000080 got=0x50000120
+# UVM_ERROR tb/env/axi_scoreboard.svh(127) @ 765000: uvm_test_top.env.scb [AXI_SCB] READ data mismatch mid=1 id=0x9 addr=0x00020000 beat=0 exp=0x500000e0 got=0x50000060
+# UVM_ERROR tb/env/axi_scoreboard.svh(127) @ 765000: uvm_test_top.env.scb [AXI_SCB] READ data mismatch mid=1 id=0x9 addr=0x00020000 beat=1 exp=0x500000e1 got=0x50000061
+# UVM_INFO tb/axi/axi_driver.svh(87) @ 765000: uvm_test_top.env.m0_agent.drv [AXI_DRV] M0 drive WRITE kind=REQ op=WRITE mid=0 id=0x4 addr=0x00000000 len=2 slave=-1 resp=0x0 ooo=0 depth=0
+# UVM_ERROR tb/env/axi_scoreboard.svh(127) @ 795000: uvm_test_top.env.scb [AXI_SCB] READ data mismatch mid=0 id=0x9 addr=0x00000000 beat=0 exp=0x50000080 got=0x50000120
+# UVM_INFO tb/env/axi_scoreboard.svh(88) @ 815000: uvm_test_top.env.scb [AXI_SCB] WRITE model updated: kind=WRITE_DATA op=WRITE mid=0 id=0x4 addr=0x00000000 len=2 slave=0 resp=0x0 ooo=0 depth=0
+# UVM_INFO tb/axi/axi_driver.svh(87) @ 815000: uvm_test_top.env.m0_agent.drv [AXI_DRV] M0 drive WRITE kind=REQ op=WRITE mid=0 id=0x5 addr=0x00000000 len=2 slave=-1 resp=0x0 ooo=0 depth=0
+# UVM_INFO tb/env/axi_scoreboard.svh(88) @ 865000: uvm_test_top.env.scb [AXI_SCB] WRITE model updated: kind=WRITE_DATA op=WRITE mid=0 id=0x5 addr=0x00000000 len=2 slave=0 resp=0x0 ooo=0 depth=0
+# UVM_INFO tb/axi/axi_driver.svh(117) @ 865000: uvm_test_top.env.m0_agent.drv [AXI_DRV] M0 drive READ kind=REQ op= READ mid=0 id=0x7 addr=0x00020000 len=1 slave=-1 resp=0x0 ooo=0 depth=0
+# UVM_INFO verilog_src/uvm-1.1d/src/base/uvm_objection.svh(1267) @ 12885000: reporter [TEST_DONE] 'run' phase is ready to proceed to the 'extract' phase
+# UVM_INFO tb/env/axi_coverage.svh(149) @ 12885000: uvm_test_top.env.cov [AXI_COV] Functional coverage = 82.50%
+# UVM_INFO tb/env/axi_scoreboard.svh(138) @ 12885000: uvm_test_top.env.scb [AXI_SCB] Scoreboard summary: pass=46 fail=8 writes=13 reads=11
+# UVM_ERROR tb/env/axi_scoreboard.svh(140) @ 12885000: uvm_test_top.env.scb [AXI_SCB] Scoreboard found 8 failures
+# 
+# --- UVM Report Summary ---
+# 
+# ** Report counts by severity
+# UVM_INFO :   43
+# UVM_WARNING :    0
+# UVM_ERROR :    9
+# UVM_FATAL :    0
+# ** Report counts by id
+# [AXI_COV]     1
+# [AXI_DRV]    24
+# [AXI_SCB]    23
+# [Questa UVM]     2
+# [RNTST]     1
+# [TEST_DONE]     1
+# ** Note: $finish    : /home/txy/apps/Questasim/questasim/linux_x86_64/../verilog_src/uvm-1.1d/src/base/uvm_root.svh(430)
+#    Time: 12885 ns  Iteration: 54  Instance: /tb_top
+# Break in Task uvm_pkg/uvm_root::run_test at /home/txy/apps/Questasim/questasim/linux_x86_64/../verilog_src/uvm-1.1d/src/base/uvm_root.svh line 430
+# ============================
+# START COVERAGE REPORT
+# ============================
+# ============================
+# SAVE UCDB
+# ============================
+# ============================
+# COVERAGE DONE
+# ============================
+# ============================================================
+# Simulation completed for TESTNAME = axi_downstream_backpressure_test
+# SV random seed used = 830930405
+# Transcript log saved to /home/txy/project/verilog/axi_full_2m3s_uvm_code/logs/axi_downstream_backpressure_test_seed_830930405.log
+# Functional coverage report saved to /home/txy/project/verilog/axi_full_2m3s_uvm_code/logs/axi_downstream_backpressure_test_seed_830930405_functional_coverage.rpt when available.
+# UCDB file saved to /home/txy/project/verilog/axi_full_2m3s_uvm_code/logs/axi_downstream_backpressure_test_seed_830930405.ucdb when available.
+# ============================================================
+# exit
+# 
+# End time: 13:37:26 on Jul 30,2026, Elapsed time: 0:00:06
+# Errors: 0, Warnings: 0

@@ -106,7 +106,7 @@ module axi_2m3s_full_dut #(
     // Master 发读地址：有效
     input  wire                  m0_arvalid,   
     // DUT 收读地址：准备好了
-    output reg                   m0_arready     
+    output reg                   m0_arready,     
 
     // ------------------------- M0 read data ----------------------------------
     output reg  [ID_WIDTH-1:0]   m0_rid,       // 读数据 ID（与 arid 对应）
@@ -114,7 +114,7 @@ module axi_2m3s_full_dut #(
     output reg  [1:0]            m0_rresp,     // 读响应
     output reg                   m0_rlast,     // 最后一个数据
     output reg                   m0_rvalid,    // DUT 发数据：有效
-    input  wire                  m0_rready     // Master 收数据：准备好了
+    input  wire                  m0_rready,     // Master 收数据：准备好了
 
     // ------------------------- M1 write address ------------------------------
     input  wire [ID_WIDTH-1:0]   m1_awid,

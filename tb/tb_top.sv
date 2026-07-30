@@ -111,6 +111,8 @@ module tb_top;
     initial begin
         uvm_config_db#(virtual axi_full_if #(32, 32, 4))::set(null, "uvm_test_top.env.m0_agent.*", "vif", m0_if);
         uvm_config_db#(virtual axi_full_if #(32, 32, 4))::set(null, "uvm_test_top.env.m1_agent.*", "vif", m1_if);
+        // 禁止 UVM 自动 finish
+        // uvm_top.finish_on_completion = 0;
         run_test();
     end
 endmodule

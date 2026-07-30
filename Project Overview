@@ -1,0 +1,544 @@
+axi_full_2m3s_uvm_code
+│
+├── rtl/
+│   └── axi_2m3s_full_dut.v
+│
+├── tb/
+│   ├── env
+│   ├── agent
+│   ├── sequence
+│   ├── scoreboard
+│   ├── coverage
+│   └── tests
+│
+└── logs/
+    ├── axi_smoke_single_rw_test.log
+    ├── axi_smoke_single_rw_test.ucdb
+    ├── axi_smoke_single_rw_test.rpt
+    ├── ...
+```
+
+这已经是一个完整 UVM 项目的骨架。
+
+但是公司里面不会只提交：
+
+> “我跑通了15个case，没有fail。”
+
+而是会形成一个：
+
+# AXI4 Full 2M3S Verification Report
+
+类似这样的东西。
+
+---
+
+# 1. 公司验证报告一般包含什么？
+
+一个完整验证报告大概结构：
+
+```
+1. Project Overview
+2. DUT Introduction
+3. Verification Environment
+4. Verification Plan
+5. Testcase Summary
+6. Simulation Result
+7. Functional Coverage
+8. Code Coverage
+9. Assertion Report
+10. Bug Summary
+11. Conclusion
+```
+
+你的项目可以完全按照这个做。
+
+---
+
+# 2. 第一部分：Project Overview
+
+写：
+
+## AXI4 Full 2M3S Verification Project
+
+例如：
+
+```
+This project verifies an AXI4 Full interconnect with
+2 masters and 3 slaves.
+
+The verification environment is developed based on UVM methodology.
+
+The main verification objectives include:
+
+- AXI protocol compliance
+- Multi-master arbitration
+- Address decoding
+- Burst transaction handling
+- Outstanding transaction support
+- Out-of-order response handling
+- Backpressure robustness
+- Error response handling
+```
+
+对应你的 DUT。
+
+---
+
+# 3. 第二部分：DUT介绍
+
+你需要画一张结构图。
+
+例如：
+
+```
+             +-------------+
+M0 AXI ----->|             |
+             |             |----> S0
+M1 AXI ----->| AXI Interconnect|
+             |             |----> S1
+             |             |----> S2
+             +-------------+
+```
+
+然后说明：
+
+## DUT Features
+
+| Feature       | Supported |
+| ------------- | --------- |
+| Master number | 2         |
+| Slave number  | 3         |
+| AXI4 Full     | Yes       |
+| Burst         | Yes       |
+| ID            | Yes       |
+| Outstanding   | Yes       |
+| Out-of-order  | Yes       |
+| Backpressure  | Yes       |
+
+这个非常像公司的 spec。
+
+---
+
+# 4. 第三部分：Verification Environment
+
+这里展示你的 UVM 架构。
+
+建议画：
+
+```
+                 Test
+                  |
+             +----+----+
+             |
+             Env
+             |
+   +----------+-----------+
+   |                      |
+ M0 Agent              M1 Agent
+   |                      |
+ Driver               Driver
+ Monitor              Monitor
+   |                      |
+   +----------+-----------+
+              |
+          Scoreboard
+              |
+          Coverage
+```
+
+然后说明：
+
+## Components
+
+| Component  | Function                  |
+| ---------- | ------------------------- |
+| Driver     | Generate AXI transactions |
+| Monitor    | Collect AXI bus activity  |
+| Sequencer  | Control stimulus          |
+| Scoreboard | Reference model checking  |
+| Coverage   | Functional coverage       |
+| Agent      | Encapsulate AXI interface |
+
+---
+
+# 5. Verification Plan（非常重要）
+
+这个是公司最看重的。
+
+你的15个测试刚好可以整理。
+
+例如：
+
+| ID   | Test                     | Purpose            |
+| ---- | ------------------------ | ------------------ |
+| TC01 | axi_smoke_single_rw      | Basic read/write   |
+| TC02 | axi_all_path_basic       | All slave access   |
+| TC03 | axi_burst_len_sweep      | Burst length       |
+| TC04 | axi_burst_data_integrity | Data correctness   |
+| TC05 | axi_write_strobe         | WSTRB checking     |
+| TC06 | multi master same slave  | Arbitration        |
+| TC07 | multi master diff slave  | Parallel access    |
+| TC08 | outstanding write        | Outstanding write  |
+| TC09 | outstanding read         | Outstanding read   |
+| TC10 | out of order read        | OOO response       |
+| TC11 | out of order write       | B response reorder |
+| TC12 | downstream backpressure  | Slave stall        |
+| TC13 | master backpressure      | Master stall       |
+| TC14 | deadlock stress          | Deadlock detection |
+| TC15 | error boundary           | Error handling     |
+
+这张表非常像真实公司的 verification plan。
+
+---
+
+# 6. Test Result Summary
+
+你的log里面：
+
+```
+Scoreboard summary:
+pass=2 fail=0
+writes=1 reads=1
+```
+
+需要自动整理。
+
+最后报告：
+
+例如：
+
+| Test | Result | Error |
+| ---- | ------ | ----- |
+| TC01 | PASS   | 0     |
+| TC02 | PASS   | 0     |
+| TC03 | PASS   | 0     |
+| ...  |        |       |
+| TC15 | PASS   | 0     |
+
+最好生成一个：
+
+```
+test_summary.csv
+```
+
+然后转换成Excel。
+
+---
+
+# 7. Functional Coverage（你现在已有）
+
+你的：
+
+```
+Functional coverage = 41.46%
+```
+
+但是公司不会只放一个数字。
+
+需要：
+
+## Coverage Model
+
+例如：
+
+你的：
+
+```systemverilog
+covergroup axi_cg;
+```
+
+整理：
+
+| Coverage Item     | Description       |
+| ----------------- | ----------------- |
+| burst_len         | Burst length      |
+| slave_id          | Address decode    |
+| operation         | Read/write        |
+| response          | OKAY/ERROR        |
+| outstanding depth | Transaction depth |
+
+然后：
+
+最终：
+
+```
+Functional Coverage
+==================
+
+Overall: 87.5%
+
+burst_len      100%
+slave_select   100%
+response       100%
+ooo            80%
+```
+
+---
+
+# 8. Code Coverage（你还缺）
+
+这个是公司一定有的。
+
+现在你只有：
+
+```
+Functional Coverage
+```
+
+还需要：
+
+## Code Coverage
+
+包括：
+
+### Statement Coverage
+
+代码执行率
+
+### Branch Coverage
+
+if/case覆盖
+
+### Toggle Coverage
+
+信号翻转
+
+### FSM Coverage
+
+状态机覆盖
+
+你的log里面之前：
+
+```
+Warning:
+Code was not compiled with coverage options
+```
+
+所以需要确认：
+
+compile：
+
+现在已经：
+
+```
+vlog -cover bcestf
+```
+
+很好。
+
+然后：
+
+```
+vsim -coverage
+```
+
+也有。
+
+之后：
+
+```
+vcover report xxx.ucdb
+```
+
+生成：
+
+```
+code_coverage.rpt
+```
+
+---
+
+# 9. Assertion Report（建议增加）
+
+公司项目一般一定有。
+
+比如 AXI：
+
+### VALID不能乱变化
+
+```systemverilog
+assert property(
+    awvalid && !awready |=> awvalid
+);
+```
+
+### Burst最后一个beat
+
+```systemverilog
+assert property(
+    wlast |-> wvalid
+);
+```
+
+### Response合法
+
+```systemverilog
+assert(bresp inside {0,2,3});
+```
+
+然后报告：
+
+```
+Assertion Summary
+
+Total Assertions: 20
+
+PASS:20
+FAIL:0
+```
+
+这个非常加分。
+
+---
+
+# 10. Regression Summary（最像公司）
+
+你现在需要增加一个：
+
+```
+regression/
+|
+├── run_regression.sh
+|
+├── result.csv
+|
+└── summary.html
+```
+
+最终运行：
+
+```bash
+./run_regression.sh
+```
+
+输出：
+
+```
+=================================
+AXI Regression Result
+=================================
+
+Total Test : 15
+
+PASS : 15
+FAIL : 0
+
+Functional Coverage : 91.2%
+Code Coverage       : 86.7%
+
+Status : PASS
+=================================
+```
+
+---
+
+# 11. 最终交付目录建议
+
+整理成：
+
+```
+AXI4_UVM_VERIFICATION_PROJECT
+
+├── rtl
+│
+├── tb
+│
+├── simulation
+│
+├── regression
+│
+├── coverage
+│
+│   ├── functional
+│   ├── code
+│   └── merged.ucdb
+│
+├── report
+│
+│   └── AXI_Verification_Report.pdf
+│
+└── README.md
+```
+
+这就是一个简化版公司的项目结构。
+
+---
+
+# 12. 你现在下一步应该做什么？
+
+按照优先级：
+
+## Step 1（现在）
+
+先自动生成：
+
+```
+15个test
+↓
+15个log
+↓
+15个ucdb
+↓
+15个rpt
+```
+
+确认：
+
+```bash
+ls logs
+```
+
+应该类似：
+
+```
+axi_smoke_single_rw_test.log
+axi_smoke_single_rw_test.ucdb
+axi_smoke_single_rw_test.rpt
+
+...
+```
+
+---
+
+## Step 2
+
+做 UCDB merge：
+
+```bash
+vcover merge total.ucdb logs/*.ucdb
+```
+
+得到：
+
+```
+total.ucdb
+```
+
+---
+
+## Step 3
+
+生成最终coverage：
+
+```bash
+vcover report total.ucdb > final_coverage.rpt
+```
+
+---
+
+## Step 4
+
+写 Verification Report PDF。
+
+---
+
+以你目前这个项目规模，如果继续完善：
+
+* 加 assertion
+* 加自动 regression
+* 加 coverage merge
+* 写报告
+
+基本就是一个**校招数字IC验证岗可以放简历的完整项目**。
+
+下一步我建议你先做 **coverage merge + 自动生成 regression summary**，因为这一步最接近公司真实验证流程。你现在缺的不是 UVM 代码，而是“验证闭环”。

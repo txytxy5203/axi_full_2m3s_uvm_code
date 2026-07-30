@@ -1,0 +1,244 @@
+COVERGROUP COVERAGE:
+-----------------------------------------------------------------------------------------------
+Covergroup                                             Metric       Goal    Status               
+                                                                                              
+-----------------------------------------------------------------------------------------------
+ TYPE /axi_env_pkg/axi_coverage/axi_cg                 46.56%        100    Uncovered            
+    covered/total bins:                                    24         66                      
+    missing/total bins:                                    42         66                      
+    % Hit:                                             36.36%        100                      
+    Coverpoint axi_cg::cp_master                       50.00%        100    Uncovered            
+        covered/total bins:                                 1          2                      
+        missing/total bins:                                 1          2                      
+        % Hit:                                         50.00%        100                      
+        bin m0                                             17          1    Covered              
+        bin m1                                              0          1    ZERO                 
+    Coverpoint axi_cg::cp_op                          100.00%        100    Covered              
+        covered/total bins:                                 2          2                      
+        missing/total bins:                                 0          2                      
+        % Hit:                                        100.00%        100                      
+        bin read                                            2          1    Covered              
+        bin write                                          15          1    Covered              
+    Coverpoint axi_cg::cp_slave                        50.00%        100    Uncovered            
+        covered/total bins:                                 2          4                      
+        missing/total bins:                                 2          4                      
+        % Hit:                                         50.00%        100                      
+        bin s0                                              5          1    Covered              
+        bin s1                                             12          1    Covered              
+        bin s2                                              0          1    ZERO                 
+        bin invalid                                         0          1    ZERO                 
+    Coverpoint axi_cg::cp_len                          20.00%        100    Uncovered            
+        covered/total bins:                                 1          5                      
+        missing/total bins:                                 4          5                      
+        % Hit:                                         20.00%        100                      
+        bin len1                                           12          1    Covered              
+        bin len2                                            0          1    ZERO                 
+        bin len4                                            0          1    ZERO                 
+        bin len8                                            0          1    ZERO                 
+        bin len16                                           0          1    ZERO                 
+    Coverpoint axi_cg::cp_resp                         50.00%        100    Uncovered            
+        covered/total bins:                                 1          2                      
+        missing/total bins:                                 1          2                      
+        % Hit:                                         50.00%        100                      
+        bin okay                                           17          1    Covered              
+        bin decerr                                          0          1    ZERO                 
+    Coverpoint axi_cg::cp_ooo                          50.00%        100    Uncovered            
+        covered/total bins:                                 1          2                      
+        missing/total bins:                                 1          2                      
+        % Hit:                                         50.00%        100                      
+        bin in_order                                       17          1    Covered              
+        bin out_of_order                                    0          1    ZERO                 
+    Coverpoint axi_cg::cp_depth                        60.00%        100    Uncovered            
+        covered/total bins:                                 3          5                      
+        missing/total bins:                                 2          5                      
+        % Hit:                                         60.00%        100                      
+        bin d0                                              5          1    Covered              
+        bin d1                                              4          1    Covered              
+        bin d2                                              8          1    Covered              
+        bin d3_4                                            0          1    ZERO                 
+        bin d5_plus                                         0          1    ZERO                 
+    Cross axi_cg::cross_master_slave_op                18.75%        100    Uncovered            
+        covered/total bins:                                 3         16                      
+        missing/total bins:                                13         16                      
+        % Hit:                                         18.75%        100                      
+        bin <m0,s1,read>                                    2          1    Covered              
+        bin <m0,s0,write>                                   5          1    Covered              
+        bin <m0,s1,write>                                  10          1    Covered              
+        bin <m0,s0,read>                                    0          1    ZERO                 
+        bin <m1,s0,read>                                    0          1    ZERO                 
+        bin <m1,s1,read>                                    0          1    ZERO                 
+        bin <m0,s2,read>                                    0          1    ZERO                 
+        bin <m1,s2,read>                                    0          1    ZERO                 
+        bin <m0,invalid,read>                               0          1    ZERO                 
+        bin <m1,invalid,read>                               0          1    ZERO                 
+        bin <m1,s0,write>                                   0          1    ZERO                 
+        bin <m1,s1,write>                                   0          1    ZERO                 
+        bin <m0,s2,write>                                   0          1    ZERO                 
+        bin <m1,s2,write>                                   0          1    ZERO                 
+        bin <m0,invalid,write>                              0          1    ZERO                 
+        bin <m1,invalid,write>                              0          1    ZERO                 
+    Cross axi_cg::cross_len_op                         20.00%        100    Uncovered            
+        covered/total bins:                                 2         10                      
+        missing/total bins:                                 8         10                      
+        % Hit:                                         20.00%        100                      
+        bin <len1,read>                                     2          1    Covered              
+        bin <len1,write>                                   10          1    Covered              
+        bin <len2,read>                                     0          1    ZERO                 
+        bin <len4,read>                                     0          1    ZERO                 
+        bin <len8,read>                                     0          1    ZERO                 
+        bin <len16,read>                                    0          1    ZERO                 
+        bin <len2,write>                                    0          1    ZERO                 
+        bin <len4,write>                                    0          1    ZERO                 
+        bin <len8,write>                                    0          1    ZERO                 
+        bin <len16,write>                                   0          1    ZERO                 
+    Cross axi_cg::cross_resp_op                        50.00%        100    Uncovered            
+        covered/total bins:                                 2          4                      
+        missing/total bins:                                 2          4                      
+        % Hit:                                         50.00%        100                      
+        bin <okay,read>                                     2          1    Covered              
+        bin <okay,write>                                   15          1    Covered              
+        bin <decerr,read>                                   0          1    ZERO                 
+        bin <decerr,write>                                  0          1    ZERO                 
+    Cross axi_cg::cross_depth_op                       40.00%        100    Uncovered            
+        covered/total bins:                                 4         10                      
+        missing/total bins:                                 6         10                      
+        % Hit:                                         40.00%        100                      
+        bin <d1,read>                                       2          1    Covered              
+        bin <d0,write>                                      5          1    Covered              
+        bin <d1,write>                                      2          1    Covered              
+        bin <d2,write>                                      8          1    Covered              
+        bin <d0,read>                                       0          1    ZERO                 
+        bin <d2,read>                                       0          1    ZERO                 
+        bin <d3_4,read>                                     0          1    ZERO                 
+        bin <d5_plus,read>                                  0          1    ZERO                 
+        bin <d3_4,write>                                    0          1    ZERO                 
+        bin <d5_plus,write>                                 0          1    ZERO                 
+    Cross axi_cg::cross_ooo_op                         50.00%        100    Uncovered            
+        covered/total bins:                                 2          4                      
+        missing/total bins:                                 2          4                      
+        % Hit:                                         50.00%        100                      
+        bin <in_order,read>                                 2          1    Covered              
+        bin <in_order,write>                               15          1    Covered              
+        bin <out_of_order,read>                             0          1    ZERO                 
+        bin <out_of_order,write>                            0          1    ZERO                 
+ Covergroup instance \/axi_env_pkg::axi_coverage::axi_cg  
+                                                       46.56%        100    Uncovered            
+    covered/total bins:                                    24         66                      
+    missing/total bins:                                    42         66                      
+    % Hit:                                             36.36%        100                      
+    Coverpoint cp_master                               50.00%        100    Uncovered            
+        covered/total bins:                                 1          2                      
+        missing/total bins:                                 1          2                      
+        % Hit:                                         50.00%        100                      
+        bin m0                                             17          1    Covered              
+        bin m1                                              0          1    ZERO                 
+    Coverpoint cp_op                                  100.00%        100    Covered              
+        covered/total bins:                                 2          2                      
+        missing/total bins:                                 0          2                      
+        % Hit:                                        100.00%        100                      
+        bin read                                            2          1    Covered              
+        bin write                                          15          1    Covered              
+    Coverpoint cp_slave                                50.00%        100    Uncovered            
+        covered/total bins:                                 2          4                      
+        missing/total bins:                                 2          4                      
+        % Hit:                                         50.00%        100                      
+        bin s0                                              5          1    Covered              
+        bin s1                                             12          1    Covered              
+        bin s2                                              0          1    ZERO                 
+        bin invalid                                         0          1    ZERO                 
+    Coverpoint cp_len                                  20.00%        100    Uncovered            
+        covered/total bins:                                 1          5                      
+        missing/total bins:                                 4          5                      
+        % Hit:                                         20.00%        100                      
+        bin len1                                           12          1    Covered              
+        bin len2                                            0          1    ZERO                 
+        bin len4                                            0          1    ZERO                 
+        bin len8                                            0          1    ZERO                 
+        bin len16                                           0          1    ZERO                 
+    Coverpoint cp_resp                                 50.00%        100    Uncovered            
+        covered/total bins:                                 1          2                      
+        missing/total bins:                                 1          2                      
+        % Hit:                                         50.00%        100                      
+        bin okay                                           17          1    Covered              
+        bin decerr                                          0          1    ZERO                 
+    Coverpoint cp_ooo                                  50.00%        100    Uncovered            
+        covered/total bins:                                 1          2                      
+        missing/total bins:                                 1          2                      
+        % Hit:                                         50.00%        100                      
+        bin in_order                                       17          1    Covered              
+        bin out_of_order                                    0          1    ZERO                 
+    Coverpoint cp_depth                                60.00%        100    Uncovered            
+        covered/total bins:                                 3          5                      
+        missing/total bins:                                 2          5                      
+        % Hit:                                         60.00%        100                      
+        bin d0                                              5          1    Covered              
+        bin d1                                              4          1    Covered              
+        bin d2                                              8          1    Covered              
+        bin d3_4                                            0          1    ZERO                 
+        bin d5_plus                                         0          1    ZERO                 
+    Cross cross_master_slave_op                        18.75%        100    Uncovered            
+        covered/total bins:                                 3         16                      
+        missing/total bins:                                13         16                      
+        % Hit:                                         18.75%        100                      
+        bin <m0,s1,read>                                    2          1    Covered              
+        bin <m0,s0,write>                                   5          1    Covered              
+        bin <m0,s1,write>                                  10          1    Covered              
+        bin <m0,s0,read>                                    0          1    ZERO                 
+        bin <m1,s0,read>                                    0          1    ZERO                 
+        bin <m1,s1,read>                                    0          1    ZERO                 
+        bin <m0,s2,read>                                    0          1    ZERO                 
+        bin <m1,s2,read>                                    0          1    ZERO                 
+        bin <m0,invalid,read>                               0          1    ZERO                 
+        bin <m1,invalid,read>                               0          1    ZERO                 
+        bin <m1,s0,write>                                   0          1    ZERO                 
+        bin <m1,s1,write>                                   0          1    ZERO                 
+        bin <m0,s2,write>                                   0          1    ZERO                 
+        bin <m1,s2,write>                                   0          1    ZERO                 
+        bin <m0,invalid,write>                              0          1    ZERO                 
+        bin <m1,invalid,write>                              0          1    ZERO                 
+    Cross cross_len_op                                 20.00%        100    Uncovered            
+        covered/total bins:                                 2         10                      
+        missing/total bins:                                 8         10                      
+        % Hit:                                         20.00%        100                      
+        bin <len1,read>                                     2          1    Covered              
+        bin <len1,write>                                   10          1    Covered              
+        bin <len2,read>                                     0          1    ZERO                 
+        bin <len4,read>                                     0          1    ZERO                 
+        bin <len8,read>                                     0          1    ZERO                 
+        bin <len16,read>                                    0          1    ZERO                 
+        bin <len2,write>                                    0          1    ZERO                 
+        bin <len4,write>                                    0          1    ZERO                 
+        bin <len8,write>                                    0          1    ZERO                 
+        bin <len16,write>                                   0          1    ZERO                 
+    Cross cross_resp_op                                50.00%        100    Uncovered            
+        covered/total bins:                                 2          4                      
+        missing/total bins:                                 2          4                      
+        % Hit:                                         50.00%        100                      
+        bin <okay,read>                                     2          1    Covered              
+        bin <okay,write>                                   15          1    Covered              
+        bin <decerr,read>                                   0          1    ZERO                 
+        bin <decerr,write>                                  0          1    ZERO                 
+    Cross cross_depth_op                               40.00%        100    Uncovered            
+        covered/total bins:                                 4         10                      
+        missing/total bins:                                 6         10                      
+        % Hit:                                         40.00%        100                      
+        bin <d1,read>                                       2          1    Covered              
+        bin <d0,write>                                      5          1    Covered              
+        bin <d1,write>                                      2          1    Covered              
+        bin <d2,write>                                      8          1    Covered              
+        bin <d0,read>                                       0          1    ZERO                 
+        bin <d2,read>                                       0          1    ZERO                 
+        bin <d3_4,read>                                     0          1    ZERO                 
+        bin <d5_plus,read>                                  0          1    ZERO                 
+        bin <d3_4,write>                                    0          1    ZERO                 
+        bin <d5_plus,write>                                 0          1    ZERO                 
+    Cross cross_ooo_op                                 50.00%        100    Uncovered            
+        covered/total bins:                                 2          4                      
+        missing/total bins:                                 2          4                      
+        % Hit:                                         50.00%        100                      
+        bin <in_order,read>                                 2          1    Covered              
+        bin <in_order,write>                               15          1    Covered              
+        bin <out_of_order,read>                             0          1    ZERO                 
+        bin <out_of_order,write>                            0          1    ZERO                 
+
+TOTAL COVERGROUP COVERAGE: 46.56%  COVERGROUP TYPES: 1
