@@ -13,20 +13,31 @@ class axi_master_base_seq extends uvm_sequence #(axi_txn);
         super.new(name);
     endfunction
 
-    task send_write(bit [31:0] addr, bit [3:0] id, int unsigned burst_len, bit [31:0] base_data, bit [3:0] strobe = 4'hF);
+    // 读和写最重要的区别：
+
+    // 写	读
+    // sequence 提供 data[]	sequence 不需要提供数据
+    // sequence 提供 strb[]	sequence 不需要提供 strb
+    // Driver 驱动 AW + W 通道	Driver 只驱动 AR 通道
+    // 数据从 Master 流向 DUT	数据从 DUT 流向 Master
+
+
+    task send_write(bit [31:0] addr, bit [3:0] id, int unsigned burst_len, 
+                    bit [31:0] base_data, bit [3:0] strobe = 4'hF);
+                    // strobe 默认全选通
         axi_txn tx;
-        tx = axi_txn::type_id::create("wr_tx");
-        start_item(tx);
+        tx = axi_txn::type_id::create("wr_tx");         // 通过UVM工厂创建
+        start_item(tx);         // 向 sequencer 请求发送权限（如果多个 sequence 同时在跑，可能需要等待） 等待 driver 准备好接收新的 item
         tx.op = AXI_WRITE;
         tx.kind = AXI_KIND_REQ;
         tx.id = id;
         tx.addr = addr;
-        tx.alloc_arrays(burst_len);
+        tx.alloc_arrays(burst_len);         // 分配 data 和 strb 数组
         for (int i = 0; i < burst_len; i++) begin
             tx.data[i] = base_data + i;
             tx.strb[i] = strobe;
         end
-        finish_item(tx);
+        finish_item(tx);        // 向 sequencer 发送 item 完成，driver 可以接收并处理
     endtask
 
     task send_read(bit [31:0] addr, bit [3:0] id, int unsigned burst_len);
@@ -38,11 +49,15 @@ class axi_master_base_seq extends uvm_sequence #(axi_txn);
         tx.id = id;
         tx.addr = addr;
         tx.alloc_arrays(burst_len);
+        // ★ 注意！读不需要设置 data 和 strb
+        // 因为读是 DUT → Master，数据是 DUT 返回的
+        // sequence 不需要提供数据
         finish_item(tx);
     endtask
 endclass
 
 class axi_single_rw_seq extends axi_master_base_seq;
+    // 这个seq相当于一次操作流程
     `uvm_object_utils(axi_single_rw_seq)
 
     bit [31:0] addr;

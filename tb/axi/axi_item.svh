@@ -1,26 +1,24 @@
 /*******************************************************************************
- * File        : axi_item.svh
- * Project     : AXI4 Full 2M3S UVM Teaching Project
- * Purpose     : AXI UVM agent source file used by the reusable master-side verification component.
- * Style       : Course-ready code with clear structure for RTL/UVM explanation.
- * Learn More  : www.bcbaoic.top
+    核心数据结构
  *******************************************************************************/
 
 class axi_txn extends uvm_sequence_item;
+    // “一张票据” 每张具体的餐单
     rand axi_op_e op;
+    // kind 字段表示 transaction 的不同阶段
     axi_kind_e kind;
 
     rand bit [AXI_ID_WIDTH-1:0]   id;
     rand bit [AXI_ADDR_WIDTH-1:0] addr;
-    rand int unsigned             burst_len;  // beats, legal values: 1/2/4/8/16
-    rand bit [AXI_DATA_WIDTH-1:0] data[];
-    rand bit [(AXI_DATA_WIDTH/8)-1:0] strb[];
+    rand int unsigned             burst_len;    // burst 长度（1/2/4/8/16）
+    rand bit [AXI_DATA_WIDTH-1:0] data[];       // 数据数组
+    rand bit [(AXI_DATA_WIDTH/8)-1:0] strb[];   // 字节选通
 
-    bit [1:0] resp;
-    int master_id;
-    int slave_id;
-    bit out_of_order;
-    int outstanding_depth;
+    bit [1:0] resp;                // 响应（OKAY/DECERR）
+    int master_id;                 // 哪个 Master 发出的（0 或 1）
+    int slave_id;                  // 目标 Slave（从地址解码）
+    bit out_of_order;              // 是否允许乱序
+    int outstanding_depth;         // outstanding 深度
 
     constraint c_len {
         burst_len inside {1, 2, 4, 8, 16};
